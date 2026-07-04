@@ -178,6 +178,52 @@ table.items td.num{font-family:'IBM Plex Mono';font-variant-numeric:tabular-nums
 .doc-foot .credit img{width:20px;height:20px;border-radius:50%;}
 .doc-foot .valid{font-size:.72rem;color:var(--muted);}
 
+/* ---------- Theme swatches ---------- */
+.theme-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:12px;}
+.theme-swatch{
+  border:2px solid transparent;border-radius:10px;padding:6px;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;gap:5px;background:#fff;
+  border-color:var(--line);
+}
+.theme-swatch.active{border-color:var(--ink);}
+.theme-swatch .dots{display:flex;gap:3px;}
+.theme-swatch .dots span{width:14px;height:14px;border-radius:50%;display:block;}
+.theme-swatch small{font-size:.62rem;color:var(--muted);text-align:center;line-height:1.2;}
+.accent-picker{display:flex;align-items:center;gap:10px;}
+.accent-picker input[type=color]{width:38px;height:38px;border:1px solid var(--line);border-radius:8px;padding:2px;background:#fff;cursor:pointer;}
+
+/* ---------- Catalog rows ---------- */
+.catalog-list{display:flex;flex-direction:column;gap:6px;margin-bottom:10px;max-height:220px;overflow-y:auto;}
+.catalog-item{
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+  padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:#fff;font-size:.82rem;
+}
+.catalog-item .info{overflow:hidden;}
+.catalog-item .info strong{display:block;font-size:.85rem;}
+.catalog-item .info span{color:var(--muted);font-size:.74rem;}
+.catalog-item .ops{display:flex;gap:6px;flex-shrink:0;}
+.catalog-item .ops button{
+  border:1px solid var(--line);background:#fff;border-radius:6px;padding:5px 9px;font-size:.72rem;
+  cursor:pointer;font-weight:600;color:var(--ink-soft);
+}
+.catalog-item .ops button.use{color:var(--accent);border-color:var(--accent);}
+.catalog-item .ops button:hover{filter:brightness(.97);}
+.save-row{display:flex;gap:8px;}
+.save-row button{
+  padding:9px 12px;border-radius:8px;border:1px dashed var(--line);background:#fff;
+  font-size:.78rem;font-weight:600;color:var(--ink-soft);cursor:pointer;white-space:nowrap;
+}
+.save-row button:hover{border-color:var(--accent);color:var(--accent);}
+.empty-catalog{font-size:.78rem;color:var(--muted);padding:10px 0;text-align:center;}
+
+.databar{display:flex;gap:10px;}
+.databar button{
+  flex:1;padding:11px;border-radius:8px;border:1px solid var(--line);background:#fff;
+  font-size:.8rem;font-weight:600;color:var(--ink-soft);cursor:pointer;
+}
+.databar button:hover{border-color:var(--ink);color:var(--ink);}
+.databar input[type=file]{display:none;}
+
 /* ---------- Actions ---------- */
 .actions{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap;}
 .btn{
@@ -220,6 +266,17 @@ table.items td.num{font-family:'IBM Plex Mono';font-variant-numeric:tabular-nums
 <div class="app">
   <!-- ============ FORM COLUMN ============ -->
   <div class="form-col">
+
+    <div class="panel">
+      <h2>Estilo de marca</h2>
+      <div class="theme-grid" id="themeGrid"></div>
+      <div class="accent-picker">
+        <input type="color" id="customAccent" value="#C1272D">
+        <div class="field" style="margin:0;flex:1;">
+          <label>Color de acento personalizado</label>
+        </div>
+      </div>
+    </div>
 
     <div class="panel">
       <h2>Tu empresa</h2>
@@ -277,6 +334,14 @@ table.items td.num{font-family:'IBM Plex Mono';font-variant-numeric:tabular-nums
         <label>Dirección (opcional)</label>
         <input id="clientAddress" placeholder="Calle, ciudad, país">
       </div>
+      <div class="save-row">
+        <button id="saveClientBtn" type="button">💾 Guardar este cliente para reutilizar</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Clientes frecuentes</h2>
+      <div class="catalog-list" id="clientCatalogList"></div>
     </div>
 
     <div class="panel">
@@ -319,6 +384,16 @@ table.items td.num{font-family:'IBM Plex Mono';font-variant-numeric:tabular-nums
     </div>
 
     <div class="panel">
+      <h2>Catálogo de productos y servicios</h2>
+      <div class="catalog-list" id="productCatalogList"></div>
+      <div class="save-row">
+        <input id="catalogNewName" placeholder="Nombre del producto/servicio" style="flex:1;padding:9px 11px;border:1px solid var(--line);border-radius:8px;font-size:.85rem;">
+        <input id="catalogNewPrice" type="number" placeholder="Precio" style="width:100px;padding:9px 11px;border:1px solid var(--line);border-radius:8px;font-size:.85rem;">
+        <button id="catalogAddBtn" type="button">+ Guardar</button>
+      </div>
+    </div>
+
+    <div class="panel">
       <h2>Ítems de la cotización</h2>
       <div class="items-list" id="itemsList"></div>
       <button class="additem" id="addItemBtn">+ Agregar ítem</button>
@@ -328,6 +403,16 @@ table.items td.num{font-family:'IBM Plex Mono';font-variant-numeric:tabular-nums
       <h2>Notas / condiciones</h2>
       <div class="field">
         <textarea id="notes" placeholder="Ej: Precios sujetos a cambio sin previo aviso. Tiempo de entrega: 5 días hábiles.">Precios no incluyen costos de envío. Cotización sujeta a disponibilidad.</textarea>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Mis datos</h2>
+      <div class="hint" style="margin-top:0;margin-bottom:12px;">Esta web no guarda nada en un servidor. Descarga un archivo con tu empresa, colores, clientes y catálogo — la próxima vez lo importas y todo vuelve a estar listo.</div>
+      <div class="databar">
+        <button id="exportDataBtn" type="button">⬇ Exportar mis datos</button>
+        <label class="btn" for="importDataInput" style="flex:1;display:flex;align-items:center;justify-content:center;padding:11px;border:1px solid var(--line);border-radius:8px;font-size:.8rem;font-weight:600;color:var(--ink-soft);cursor:pointer;">⬆ Importar mis datos</label>
+        <input type="file" id="importDataInput" accept="application/json">
       </div>
     </div>
 
@@ -409,6 +494,17 @@ let items = [
 ];
 let companyLogoDataUrl = null;
 let itemSeq = 0;
+let productCatalog = [];
+let clientCatalog = [];
+
+const THEMES = [
+  { id:'ejecutivo', name:'Ejecutivo', ink:'#14171F', accent:'#C1272D', canvas:'#ECEDF1' },
+  { id:'esmeralda', name:'Esmeralda', ink:'#0F241D', accent:'#1F8A5F', canvas:'#EAEFEC' },
+  { id:'azul', name:'Corporativo', ink:'#101826', accent:'#2158C9', canvas:'#EBEDF2' },
+  { id:'terracota', name:'Cálido', ink:'#2B211C', accent:'#C1652B', canvas:'#F0ECE6' },
+  { id:'violeta', name:'Elegante', ink:'#1D1526', accent:'#6C3FC5', canvas:'#EEECF2' },
+];
+let activeTheme = THEMES[0].id;
 
 const $ = (id) => document.getElementById(id);
 
@@ -546,6 +642,37 @@ function renderPreview(){
   $('pvNotes').textContent = $('notes').value || '';
 }
 
+// ---------- Theme selector ----------
+function applyTheme(theme, customAccent){
+  const root = document.documentElement.style;
+  root.setProperty('--ink', theme.ink);
+  root.setProperty('--accent', customAccent || theme.accent);
+  root.setProperty('--canvas', theme.canvas);
+}
+
+function renderThemeGrid(){
+  const grid = $('themeGrid');
+  grid.innerHTML = '';
+  THEMES.forEach(theme => {
+    const sw = document.createElement('div');
+    sw.className = 'theme-swatch' + (theme.id === activeTheme ? ' active' : '');
+    sw.innerHTML = `<div class="dots"><span style="background:${theme.ink}"></span><span style="background:${theme.accent}"></span></div><small>${theme.name}</small>`;
+    sw.addEventListener('click', () => {
+      activeTheme = theme.id;
+      $('customAccent').value = theme.accent;
+      applyTheme(theme);
+      renderThemeGrid();
+      showToast(`Estilo "${theme.name}" aplicado`);
+    });
+    grid.appendChild(sw);
+  });
+}
+
+$('customAccent').addEventListener('input', (e) => {
+  const theme = THEMES.find(t => t.id === activeTheme) || THEMES[0];
+  applyTheme(theme, e.target.value);
+});
+
 // ---------- Company logo upload ----------
 $('companyLogoInput').addEventListener('change', (e) => {
   const file = e.target.files[0];
@@ -559,6 +686,174 @@ $('companyLogoInput').addEventListener('change', (e) => {
   };
   reader.readAsDataURL(file);
 });
+
+// ---------- Product catalog ----------
+function renderProductCatalog(){
+  const list = $('productCatalogList');
+  if(productCatalog.length === 0){
+    list.innerHTML = '<div class="empty-catalog">Aún no has guardado productos. Los que guardes aquí podrás insertarlos con un clic.</div>';
+    return;
+  }
+  list.innerHTML = '';
+  productCatalog.forEach((p, idx) => {
+    const row = document.createElement('div');
+    row.className = 'catalog-item';
+    row.innerHTML = `
+      <div class="info"><strong>${escapeHtml(p.name)}</strong><span>${$('currency') ? $('currency').value : ''} ${money(p.price)}</span></div>
+      <div class="ops">
+        <button class="use" data-idx="${idx}" data-act="use">Insertar</button>
+        <button data-idx="${idx}" data-act="del">Eliminar</button>
+      </div>`;
+    list.appendChild(row);
+  });
+  list.querySelectorAll('button').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const idx = parseInt(e.target.dataset.idx);
+      if(e.target.dataset.act === 'use'){
+        const p = productCatalog[idx];
+        items.push({ desc: p.name, qty: 1, price: p.price });
+        renderItemRows();
+        renderPreview();
+        showToast(`"${p.name}" insertado en la cotización`);
+      } else {
+        productCatalog.splice(idx,1);
+        renderProductCatalog();
+      }
+    });
+  });
+}
+
+$('catalogAddBtn').addEventListener('click', () => {
+  const name = $('catalogNewName').value.trim();
+  const price = parseFloat($('catalogNewPrice').value) || 0;
+  if(!name){ showToast('Escribe un nombre de producto primero'); return; }
+  productCatalog.push({ name, price });
+  $('catalogNewName').value = '';
+  $('catalogNewPrice').value = '';
+  renderProductCatalog();
+  showToast('Producto guardado en tu catálogo');
+});
+
+// ---------- Client catalog ----------
+function renderClientCatalog(){
+  const list = $('clientCatalogList');
+  if(clientCatalog.length === 0){
+    list.innerHTML = '<div class="empty-catalog">Guarda tus clientes frecuentes para no volver a escribirlos.</div>';
+    return;
+  }
+  list.innerHTML = '';
+  clientCatalog.forEach((c, idx) => {
+    const row = document.createElement('div');
+    row.className = 'catalog-item';
+    row.innerHTML = `
+      <div class="info"><strong>${escapeHtml(c.name)}</strong><span>${escapeHtml(c.phone || c.email || '')}</span></div>
+      <div class="ops">
+        <button class="use" data-idx="${idx}" data-act="use">Usar</button>
+        <button data-idx="${idx}" data-act="del">Eliminar</button>
+      </div>`;
+    list.appendChild(row);
+  });
+  list.querySelectorAll('button').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const idx = parseInt(e.target.dataset.idx);
+      if(e.target.dataset.act === 'use'){
+        const c = clientCatalog[idx];
+        $('clientName').value = c.name || '';
+        $('clientPhone').value = c.phone || '';
+        $('clientEmail').value = c.email || '';
+        $('clientAddress').value = c.address || '';
+        renderPreview();
+        showToast(`Cliente "${c.name}" cargado`);
+      } else {
+        clientCatalog.splice(idx,1);
+        renderClientCatalog();
+      }
+    });
+  });
+}
+
+$('saveClientBtn').addEventListener('click', () => {
+  const name = $('clientName').value.trim();
+  if(!name){ showToast('Escribe el nombre del cliente primero'); return; }
+  clientCatalog.push({
+    name, phone: $('clientPhone').value, email: $('clientEmail').value, address: $('clientAddress').value
+  });
+  renderClientCatalog();
+  showToast('Cliente guardado para reutilizar');
+});
+
+// ---------- Export / Import data ----------
+$('exportDataBtn').addEventListener('click', () => {
+  const payload = {
+    business: {
+      name: $('bizName').value, taxId: $('bizTaxId').value, phone: $('bizPhone').value,
+      email: $('bizEmail').value, address: $('bizAddress').value, logo: companyLogoDataUrl
+    },
+    theme: { id: activeTheme, customAccent: $('customAccent').value },
+    currency: $('currency').value, taxRate: $('taxRate').value, discountRate: $('discountRate').value,
+    notes: $('notes').value,
+    productCatalog, clientCatalog,
+    lastQuoteNum: $('quoteNum').value
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type:'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'mis-datos-cotiza.json'; a.click();
+  URL.revokeObjectURL(url);
+  showToast('Datos exportados ✓');
+});
+
+$('importDataInput').addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    try{
+      const data = JSON.parse(ev.target.result);
+      if(data.business){
+        $('bizName').value = data.business.name || '';
+        $('bizTaxId').value = data.business.taxId || '';
+        $('bizPhone').value = data.business.phone || '';
+        $('bizEmail').value = data.business.email || '';
+        $('bizAddress').value = data.business.address || '';
+        if(data.business.logo){
+          companyLogoDataUrl = data.business.logo;
+          $('companyLogoPreview').innerHTML = `<img src="${companyLogoDataUrl}" alt="logo empresa">`;
+          $('previewCompanyLogo').src = companyLogoDataUrl;
+        }
+      }
+      if(data.theme){
+        activeTheme = data.theme.id || THEMES[0].id;
+        $('customAccent').value = data.theme.customAccent || THEMES[0].accent;
+        const theme = THEMES.find(t=>t.id===activeTheme) || THEMES[0];
+        applyTheme(theme, data.theme.customAccent);
+        renderThemeGrid();
+      }
+      if(data.currency) $('currency').value = data.currency;
+      if(data.taxRate !== undefined) $('taxRate').value = data.taxRate;
+      if(data.discountRate !== undefined) $('discountRate').value = data.discountRate;
+      if(data.notes !== undefined) $('notes').value = data.notes;
+      productCatalog = data.productCatalog || [];
+      clientCatalog = data.clientCatalog || [];
+      renderProductCatalog();
+      renderClientCatalog();
+      if(data.lastQuoteNum) $('quoteNum').value = incrementQuoteNum(data.lastQuoteNum);
+      renderPreview();
+      showToast('Datos importados ✓ — todo listo para cotizar');
+    }catch(err){
+      showToast('El archivo no es válido');
+    }
+  };
+  reader.readAsText(file);
+});
+
+function incrementQuoteNum(num){
+  const match = String(num).match(/^(.*?)(\d+)$/);
+  if(!match) return num;
+  const digits = match[2];
+  const next = (parseInt(digits,10)+1).toString().padStart(digits.length,'0');
+  return match[1] + next;
+}
 
 // ---------- Live updates ----------
 ['bizName','bizTaxId','bizPhone','bizEmail','bizAddress',
@@ -752,7 +1047,10 @@ $('sendEmailBtn').addEventListener('click', () => {
 
 // ---------- Init ----------
 $('quoteDate').value = todayISO();
+renderThemeGrid();
 renderItemRows();
+renderProductCatalog();
+renderClientCatalog();
 renderPreview();
 
 </script>
